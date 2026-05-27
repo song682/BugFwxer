@@ -1,0 +1,15 @@
+{
+  "package": "decok.dfcdvadstf.bugfwxer.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mixins.bugfwxer.refmap.json",
+  "mixins": [
+    "mixin.minecraft.entity.MixinEntityBat",
+    "mixin.minecraft.item.MixinItemDye",
+    "mixin.minecraft.item.MixinItemMonsterPlacer",
+    "mixin.minecraft.gui.MixinGuiSlot"
+  ],
+  "client": [
+  ],
+  "required": true,
+  "minVersion": "0.7.11"
+}
