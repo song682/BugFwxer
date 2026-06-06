@@ -6,6 +6,7 @@
     "mixin.minecraft.entity.MixinEntityBat",
     "mixin.minecraft.item.MixinItemDye",
     "mixin.minecraft.item.MixinItemMonsterPlacer",
+    "mixin.minecraft.item.MixinItemStack",
     "mixin.minecraft.gui.MixinGuiSlot"
   ],
   "client": [
