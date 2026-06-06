@@ -26,3 +26,4 @@ run
 # Files from Forge MDK
 *.txt
 .fake
+.gitattributes
