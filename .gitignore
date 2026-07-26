@@ -19,7 +19,9 @@ build
 .gradle
 
 # minecraft
-minecraft
+# Only ignore the run directory at repo root, not source packages like mixins/mixin/minecraft
+# 仅忽略仓库根目录的运行目录，避免误伤 mixins/mixin/minecraft 等源码包
+/minecraft
 eclipse
 run
 

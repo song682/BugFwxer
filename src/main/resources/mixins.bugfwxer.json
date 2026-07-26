@@ -4,6 +4,7 @@
   "refmap": "mixins.bugfwxer.refmap.json",
   "mixins": [
     "mixin.minecraft.entity.MixinEntityBat",
+    "mixin.minecraft.entity.MixinEntityItem",
     "mixin.minecraft.item.MixinItemDye",
     "mixin.minecraft.item.MixinItemMonsterPlacer",
     "mixin.minecraft.item.MixinItemStack",
