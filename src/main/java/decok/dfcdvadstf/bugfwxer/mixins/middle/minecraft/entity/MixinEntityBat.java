@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.mixin.minecraft.entity;
+package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.entity;
 
 import net.minecraft.client.model.ModelBat;
 import org.spongepowered.asm.mixin.Mixin;

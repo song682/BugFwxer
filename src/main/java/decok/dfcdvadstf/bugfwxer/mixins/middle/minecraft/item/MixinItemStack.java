@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.mixin.minecraft.item;
+package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.item;
 
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

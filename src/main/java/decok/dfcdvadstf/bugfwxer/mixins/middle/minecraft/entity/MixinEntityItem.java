@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.mixin.minecraft.entity;
+package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;

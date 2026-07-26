@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.mixin.minecraft.item;
+package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;

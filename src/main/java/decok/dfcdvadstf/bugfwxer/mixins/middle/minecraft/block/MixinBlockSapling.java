@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.mixin.minecraft.block;
+package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.block;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.block.BlockSapling;
@@ -6,6 +6,8 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+
+import javax.annotation.Nonnull;
 
 @Mixin(BlockSapling.class)
 public abstract class MixinBlockSapling {
@@ -39,7 +41,7 @@ public abstract class MixinBlockSapling {
         method = "func_149851_a",
         at = @At("RETURN")
     )
-    private boolean requireDarkOakCluster(boolean original, World world, int x, int y, int z, boolean isClient) {
+    private boolean requireDarkOakCluster(boolean original, @Nonnull World world, int x, int y, int z, boolean isClient) {
         // 仅处理黑橡木树苗（meta & 7 == 5），其余树苗保持原判定
         // Only handle dark oak saplings (meta & 7 == 5); other sapling types keep the original result
         if ((world.getBlockMetadata(x, y, z) & 7) == 5) {

@@ -3,16 +3,16 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.bugfwxer.refmap.json",
   "mixins": [
-    "mixin.minecraft.block.MixinBlockSapling",
-    "mixin.minecraft.block.MixinBlockTallGrass",
-    "mixin.minecraft.entity.MixinEntityBat",
-    "mixin.minecraft.entity.MixinEntityItem",
-    "mixin.minecraft.item.MixinItemDye",
-    "mixin.minecraft.item.MixinItemMonsterPlacer",
-    "mixin.minecraft.item.MixinItemStack",
-    "mixin.minecraft.gui.MixinGuiSlot"
+    "middle.minecraft.block.MixinBlockSapling",
+    "middle.minecraft.block.MixinBlockTallGrass",
+    "middle.minecraft.item.MixinItemDye",
+    "middle.minecraft.entity.MixinEntityItem",
+    "middle.minecraft.item.MixinItemMonsterPlacer",
+    "middle.minecraft.item.MixinItemStack"
   ],
   "client": [
+    "middle.minecraft.entity.MixinEntityBat",
+    "middle.minecraft.gui.MixinGuiSlot"
   ],
   "required": true,
   "minVersion": "0.7.11"
