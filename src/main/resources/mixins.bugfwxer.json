@@ -3,6 +3,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.bugfwxer.refmap.json",
   "mixins": [
+    "mixin.minecraft.block.MixinBlockTallGrass",
     "mixin.minecraft.entity.MixinEntityBat",
     "mixin.minecraft.entity.MixinEntityItem",
     "mixin.minecraft.item.MixinItemDye",
