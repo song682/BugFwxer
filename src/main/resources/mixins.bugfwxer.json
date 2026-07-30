@@ -2,6 +2,7 @@
   "package": "decok.dfcdvadstf.bugfwxer.mixins",
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.bugfwxer.refmap.json",
+  "plugin": "decok.dfcdvadstf.bugfwxer.config.MixinPlugin",
   "mixins": [
     "middle.minecraft.block.MixinBlockSapling",
     "middle.minecraft.block.MixinBlockTallGrass",
