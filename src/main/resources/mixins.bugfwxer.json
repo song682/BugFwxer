@@ -13,7 +13,8 @@
   ],
   "client": [
     "middle.minecraft.entity.MixinEntityBat",
-    "middle.minecraft.gui.MixinGuiSlot"
+    "middle.minecraft.gui.MixinGuiSlot",
+    "middle.minecraft.client.MixinMinecraft"
   ],
   "required": true,
   "minVersion": "0.7.11"

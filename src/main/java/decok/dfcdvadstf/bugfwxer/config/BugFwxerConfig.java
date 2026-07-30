@@ -70,6 +70,13 @@ public class BugFwxerConfig {
     public static boolean fixGuiSlotNegativeScroll = true;
 
     /**
+     * Block the window close request (Alt+F4 / title-bar close button),
+     * forcing players to quit through the in-game menu.
+     * 阻拦窗口关闭请求（Alt+F4 / 标题栏关闭按钮），强制玩家通过游戏内菜单退出。
+     */
+    public static boolean blockAltF4WindowClose = true;
+
+    /**
      * <p>
      *     Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
      *     加载（首次运行时创建）{@code config/bugfwxer.cfg}。
@@ -122,6 +129,10 @@ public class BugFwxerConfig {
             fixGuiSlotNegativeScroll = config.getBoolean("fixGuiSlotNegativeScroll", CATEGORY_FIXES, true,
                 "Clamp GUI list scroll amount to non-negative when the list is shorter than the view. Client only.\n"
                 + "当列表内容不足一屏时，将 GUI 列表滚动量钳制为非负值。仅客户端。");
+
+            blockAltF4WindowClose = config.getBoolean("blockAltF4WindowClose", CATEGORY_FIXES, true,
+                "Block the window close request (Alt+F4 / title-bar close button); quit via the in-game menu instead. Client only.\n"
+                + "阻拦窗口关闭请求（Alt+F4 / 标题栏关闭按钮），请改用游戏内菜单退出。仅客户端。");
         } finally {
             // Persist defaults / newly added keys back to disk
             // 将默认值或新增键写回磁盘

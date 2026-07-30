@@ -49,6 +49,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         mixinToggles.put(prefix + "middle.minecraft.item.MixinItemStack", BugFwxerConfig.fixItemStackHasEffectNpe);
         mixinToggles.put(prefix + "middle.minecraft.entity.MixinEntityBat", BugFwxerConfig.fixBatWingAnimationOverflow);
         mixinToggles.put(prefix + "middle.minecraft.gui.MixinGuiSlot", BugFwxerConfig.fixGuiSlotNegativeScroll);
+        mixinToggles.put(prefix + "middle.minecraft.client.MixinMinecraft", BugFwxerConfig.blockAltF4WindowClose);
     }
 
     @Override
