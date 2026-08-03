@@ -1,5 +1,6 @@
-package decok.dfcdvadstf.bugfwxer.config;
+package decok.dfcdvadstf.bugfwxer.mixins;
 
+import decok.dfcdvadstf.bugfwxer.BugFwxerConfig;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -11,15 +12,15 @@ import java.util.Set;
 
 /**
  * <p>
- *     Mixin config plugin that gates every mixin behind its config toggle.<br>
- *     通过配置开关控制每个 Mixin 是否应用的 Mixin 配置插件。
+ * Mixin config plugin that gates every mixin behind its config toggle.<br>
+ * 通过配置开关控制每个 Mixin 是否应用的 Mixin 配置插件。
  * </p>
  * <p>
- *     {@link #onLoad(String)} runs before any target class is transformed, so
- *     disabled fixes are never injected at all — no runtime flag checks needed
- *     inside the mixins themselves.<br>
- *     {@link #onLoad(String)} 在任何目标类被转换之前执行，被禁用的修复根本不会注入，
- *     Mixin 内部也就无需任何运行时开关判断。
+ * {@link #onLoad(String)} runs before any target class is transformed, so
+ * disabled fixes are never injected at all — no runtime flag checks needed
+ * inside the mixins themselves.<br>
+ * {@link #onLoad(String)} 在任何目标类被转换之前执行，被禁用的修复根本不会注入，
+ * Mixin 内部也就无需任何运行时开关判断。
  * </p>
  *
  * @author Seniye
@@ -30,7 +31,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
      * Maps each mixin class name to whether its fix is enabled.
      * 记录每个 Mixin 类名对应的修复是否启用。
      */
-    private final Map<String, Boolean> mixinToggles = new HashMap<String, Boolean>();
+    private final Map<String, Boolean> mixinToggles = new HashMap<>();
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -45,11 +46,16 @@ public class MixinPlugin implements IMixinConfigPlugin {
         mixinToggles.put(prefix + "middle.minecraft.block.MixinBlockTallGrass", BugFwxerConfig.fixBonemealHeightLimit);
         mixinToggles.put(prefix + "middle.minecraft.item.MixinItemDye", BugFwxerConfig.fixBonemealHeightLimit);
         mixinToggles.put(prefix + "middle.minecraft.entity.MixinEntityItem", BugFwxerConfig.fixItemPositionDesync);
-        mixinToggles.put(prefix + "middle.minecraft.item.MixinItemMonsterPlacer", BugFwxerConfig.peacefulMonsterEggRestriction);
+        mixinToggles.put(prefix + "middle.minecraft.item.MixinItemMonsterPlacer",
+                BugFwxerConfig.peacefulMonsterEggRestriction);
         mixinToggles.put(prefix + "middle.minecraft.item.MixinItemStack", BugFwxerConfig.fixItemStackHasEffectNpe);
         mixinToggles.put(prefix + "middle.minecraft.entity.MixinEntityBat", BugFwxerConfig.fixBatWingAnimationOverflow);
         mixinToggles.put(prefix + "middle.minecraft.gui.MixinGuiSlot", BugFwxerConfig.fixGuiSlotNegativeScroll);
         mixinToggles.put(prefix + "middle.minecraft.client.MixinMinecraft", BugFwxerConfig.blockAltF4WindowClose);
+        // The GUI-switch music fix spans two mixins that must toggle together
+        // GUI 切换音乐修复由两个 Mixin 共同组成，必须一起开关
+        mixinToggles.put(prefix + "middle.minecraft.audio.MixinSoundManager", BugFwxerConfig.keepMusicDuringGuiSwitch);
+        mixinToggles.put(prefix + "middle.minecraft.audio.MixinMusicTicker", BugFwxerConfig.keepMusicDuringGuiSwitch);
     }
 
     @Override

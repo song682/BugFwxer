@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.client;
+package decok.dfcdvadstf.bugfwxer.mixins.early.minecraft.client;
 
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * </p>
  *
  * @author Seniye
- * @see net.minecraft.client.Minecraft#shutdown() Minecraft.shutdown
+ * @see Minecraft#shutdown() Minecraft.shutdown
  */
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -42,12 +42,12 @@ public abstract class MixinMinecraft {
      * 否则透传真实值（标题栏关闭按钮保持可用）。
      */
     @Redirect(
-        method = "runGameLoop",
-        at = @At(
-            value = "INVOKE",
-            target = "Lorg/lwjgl/opengl/Display;isCloseRequested()Z",
-            remap = false
-        )
+            method = "runGameLoop",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lorg/lwjgl/opengl/Display;isCloseRequested()Z",
+                    remap = false
+            )
     )
     private boolean bugfwxer$blockAltF4Close() {
         // Poll LWJGL once: this consumes the pending close request (flag resets on read)

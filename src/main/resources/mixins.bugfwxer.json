@@ -2,7 +2,7 @@
   "package": "decok.dfcdvadstf.bugfwxer.mixins",
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.bugfwxer.refmap.json",
-  "plugin": "decok.dfcdvadstf.bugfwxer.config.MixinPlugin",
+  "plugin": "decok.dfcdvadstf.bugfwxer.mixins.MixinPlugin",
   "mixins": [
     "middle.minecraft.block.MixinBlockSapling",
     "middle.minecraft.block.MixinBlockTallGrass",
@@ -14,7 +14,9 @@
   "client": [
     "middle.minecraft.entity.MixinEntityBat",
     "middle.minecraft.gui.MixinGuiSlot",
-    "middle.minecraft.client.MixinMinecraft"
+    "middle.minecraft.audio.MixinSoundManager",
+    "middle.minecraft.audio.MixinMusicTicker",
+    "early.minecraft.client.MixinMinecraft"
   ],
   "required": true,
   "minVersion": "0.7.11"
