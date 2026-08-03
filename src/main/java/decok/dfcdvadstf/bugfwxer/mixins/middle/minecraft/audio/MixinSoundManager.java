@@ -7,9 +7,12 @@ import net.minecraft.client.audio.SoundManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import paulscode.sound.SoundSystem;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,17 +27,28 @@ import java.util.Map;
  * 打开/关闭暂停菜单不再让 MusicTicker 曲目经历 paulscode 流式暂停/恢复的往返——
  * 正是该往返导致音乐中断并留下 10~20 分钟的音乐静默。
  *
+ * <p>Implementation note: the music entries are temporarily removed from
+ * {@code playingSounds} before the vanilla loop runs (HEAD) and put back
+ * afterwards (TAIL). Because the map is a Guava HashBiMap the inverse map is
+ * maintained automatically, and the vanilla code simply never sees the music
+ * channel ids, so it cannot pause/resume them.</p>
+ * <p>实现说明：在原版遍历（HEAD）之前把音乐条目临时从 {@code playingSounds}
+ * 中移除，遍历结束（TAIL）再放回。由于该映射是 Guava HashBiMap，反向映射会
+ * 自动同步维护，原版代码根本看不到音乐声道 id，自然无法暂停/恢复它们。</p>
+ *
  * @author Seniye
  */
 @Mixin(SoundManager.class)
 public abstract class MixinSoundManager {
 
     /**
-     * Inverse map of currently playing sounds, mapping channel id back to the
-     * ISound. 声道 id 反查 ISound 的映射表。
+     * Map of currently playing sounds, channel id to ISound. A Guava HashBiMap,
+     * so the inverse map stays in sync on remove/put.
+     * 当前播放中的声音映射表（声道 id → ISound）。Guava HashBiMap，
+     * remove/put 时反向映射自动同步。
      */
     @Shadow
-    private Map invPlayingSounds;
+    private Map playingSounds;
 
     /**
      * Reference to the sound handler, used to resolve a sound's category.
@@ -44,32 +58,73 @@ public abstract class MixinSoundManager {
     private SoundHandler sndHandler;
 
     /**
-     * Skips the pause for music channels while still pausing every other sound.
-     * 暂停所有非音乐声道，音乐声道保持继续播放。
+     * Music entries hidden from the vanilla pause/resume loop; restored at TAIL.
+     * 从原版暂停/恢复循环中隐藏的音乐条目，TAIL 时恢复。
      */
-    @Redirect(method = "pauseAllSounds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/SoundManager$SoundSystemStarterThread;pause(Ljava/lang/String;)V", remap = false))
-    private void bugfwxer$pauseExceptMusic(SoundSystem sndSystem, String s) {
-        ISound isound = (ISound) this.invPlayingSounds.get(s);
+    private final List<Map.Entry> bugfwxer$hiddenMusic = new ArrayList<Map.Entry>();
 
-        if (isound == null || !this.bugfwxer$isMusicSound(isound)) {
-            sndSystem.pause(s);
+    /**
+     * Removes music entries from playingSounds before the vanilla pause loop.
+     * 在原版暂停循环前把音乐条目从 playingSounds 中移除。
+     */
+    @Inject(method = "pauseAllSounds", at = @At("HEAD"))
+    private void bugfwxer$hideMusicBeforePause(CallbackInfo ci) {
+        this.bugfwxer$hideMusic();
+    }
+
+    /**
+     * Puts the hidden music entries back after the vanilla pause loop.
+     * 原版暂停循环结束后恢复被隐藏的音乐条目。
+     */
+    @Inject(method = "pauseAllSounds", at = @At("TAIL"))
+    private void bugfwxer$restoreMusicAfterPause(CallbackInfo ci) {
+        this.bugfwxer$restoreMusic();
+    }
+
+    /**
+     * Removes music entries from playingSounds before the vanilla resume loop.
+     * 在原版恢复循环前把音乐条目从 playingSounds 中移除。
+     */
+    @Inject(method = "resumeAllSounds", at = @At("HEAD"))
+    private void bugfwxer$hideMusicBeforeResume(CallbackInfo ci) {
+        this.bugfwxer$hideMusic();
+    }
+
+    /**
+     * Puts the hidden music entries back after the vanilla resume loop.
+     * 原版恢复循环结束后恢复被隐藏的音乐条目。
+     */
+    @Inject(method = "resumeAllSounds", at = @At("TAIL"))
+    private void bugfwxer$restoreMusicAfterResume(CallbackInfo ci) {
+        this.bugfwxer$restoreMusic();
+    }
+
+    /**
+     * Removes every music entry from playingSounds and stashes it for restore.
+     * 把全部音乐条目从 playingSounds 中移除并暂存待恢复。
+     */
+    private void bugfwxer$hideMusic() {
+        this.bugfwxer$hiddenMusic.clear();
+        Iterator iterator = this.playingSounds.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry entry = (Map.Entry) iterator.next();
+            if (this.bugfwxer$isMusicSound((ISound) entry.getValue())) {
+                this.bugfwxer$hiddenMusic.add(entry);
+                iterator.remove();
+            }
         }
     }
 
     /**
-     * Skips the resume for music channels; they were never paused, and calling
-     * play() again on an already-streaming source is exactly the kind of extra
-     * round-trip this fix wants to avoid.
-     * 恢复所有非音乐声道；音乐声道从未被暂停，对仍在流式播放的源再次 play()
-     * 正是本修复希望避免的多余往返。
+     * Restores the stashed music entries into playingSounds.
+     * 把暂存的音乐条目恢复进 playingSounds。
      */
-    @Redirect(method = "resumeAllSounds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/SoundManager$SoundSystemStarterThread;play(Ljava/lang/String;)V", remap = false))
-    private void bugfwxer$resumeExceptMusic(SoundSystem sndSystem, String s) {
-        ISound isound = (ISound) this.invPlayingSounds.get(s);
-
-        if (isound == null || !this.bugfwxer$isMusicSound(isound)) {
-            sndSystem.play(s);
+    private void bugfwxer$restoreMusic() {
+        for (Map.Entry entry : this.bugfwxer$hiddenMusic) {
+            this.playingSounds.put(entry.getKey(), entry.getValue());
         }
+        this.bugfwxer$hiddenMusic.clear();
     }
 
     /**
