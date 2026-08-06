@@ -15,6 +15,7 @@
     "middle.minecraft.entity.MixinEntityBat",
     "middle.minecraft.client.gui.MixinGuiSlot",
     "middle.minecraft.client.gui.MixinGuiContainerCreative",
+    "middle.minecraft.client.gui.MixinFontRenderer",
     "middle.minecraft.audio.MixinSoundManager",
     "middle.minecraft.audio.MixinMusicTicker",
     "early.minecraft.client.MixinMinecraft"

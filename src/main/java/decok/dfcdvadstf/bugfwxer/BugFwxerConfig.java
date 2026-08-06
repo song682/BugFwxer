@@ -95,6 +95,17 @@ public class BugFwxerConfig {
         public static boolean fixCreativeScrollbarTabClick = true;
 
         /**
+         * Fix FontRenderer logic errors: unicode width now matches the actual
+         * rendered advance, overflowing first characters no longer crash
+         * word-wrapping with a StackOverflowError, a trailing formatting code
+         * costs no width, and the obfuscated style can no longer hang the game.
+         * 修复 FontRenderer 逻辑错误：unicode 宽度与实际渲染推进一致、超宽首字符
+         * 不再导致换行 StackOverflowError 崩溃、末尾格式码不再占负宽度、
+         * 乱码样式不再可能卡死游戏。
+         */
+        public static boolean fixFontRendererLogic = true;
+
+        /**
          * <p>
          * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
          * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
@@ -164,6 +175,10 @@ public class BugFwxerConfig {
                                         true,
                                         "Fix MC-179165: releasing the mouse over a creative inventory tab while dragging the scrollbar no longer switches to that tab. Client only.\n"
                                                         + "修复 MC-179165：拖动创造模式物品栏滚动条时，在标签上松开鼠标不再误切换到该标签。仅客户端。");
+
+                        fixFontRendererLogic = config.getBoolean("fixFontRendererLogic", CATEGORY_FIXES, true,
+                                        "Fix FontRenderer logic: unicode width matches the rendered advance, overflowing first chars no longer crash word wrap (StackOverflowError), trailing format codes cost no width, and the obfuscated style can no longer hang the game. Client only.\n"
+                                                        + "修复 FontRenderer 逻辑：unicode 宽度与实际渲染推进一致、超宽首字符不再导致换行崩溃（StackOverflowError）、末尾格式码不占宽度、乱码样式不再卡死游戏。仅客户端。");
                 } finally {
                         // Persist defaults / newly added keys back to disk
                         // 将默认值或新增键写回磁盘
