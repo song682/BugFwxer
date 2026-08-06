@@ -50,7 +50,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
                 BugFwxerConfig.peacefulMonsterEggRestriction);
         mixinToggles.put(prefix + "middle.minecraft.item.MixinItemStack", BugFwxerConfig.fixItemStackHasEffectNpe);
         mixinToggles.put(prefix + "middle.minecraft.entity.MixinEntityBat", BugFwxerConfig.fixBatWingAnimationOverflow);
-        mixinToggles.put(prefix + "middle.minecraft.gui.MixinGuiSlot", BugFwxerConfig.fixGuiSlotNegativeScroll);
+        mixinToggles.put(prefix + "middle.minecraft.client.gui.MixinGuiSlot", BugFwxerConfig.fixGuiSlotNegativeScroll);
+        mixinToggles.put(prefix + "middle.minecraft.client.gui.MixinGuiContainerCreative",
+                BugFwxerConfig.fixCreativeScrollbarTabClick);
         mixinToggles.put(prefix + "middle.minecraft.client.MixinMinecraft", BugFwxerConfig.blockAltF4WindowClose);
         // The GUI-switch music fix spans two mixins that must toggle together
         // GUI 切换音乐修复由两个 Mixin 共同组成，必须一起开关

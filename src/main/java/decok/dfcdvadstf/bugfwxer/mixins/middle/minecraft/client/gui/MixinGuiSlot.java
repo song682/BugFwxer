@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.gui;
+package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.client.gui;
 
 import net.minecraft.client.gui.GuiSlot;
 import org.spongepowered.asm.mixin.Mixin;

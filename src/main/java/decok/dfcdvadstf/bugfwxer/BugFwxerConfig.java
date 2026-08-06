@@ -23,138 +23,153 @@ import java.io.File;
  */
 public class BugFwxerConfig {
 
-    /** Config category holding all fix toggles. 存放所有修复开关的配置分类。 */
-    public static final String CATEGORY_FIXES = "fixes";
+        /** Config category holding all fix toggles. 存放所有修复开关的配置分类。 */
+        public static final String CATEGORY_FIXES = "fixes";
 
-    /**
-     * Fix dark oak sapling consuming bonemeal without a valid 2x2 cluster.
-     * 修复黑橡木树苗在没有 2x2 阵型时仍消耗骨粉的问题。
-     */
-    public static boolean fixDarkOakSaplingBonemeal = true;
+        /**
+         * Fix dark oak sapling consuming bonemeal without a valid 2x2 cluster.
+         * 修复黑橡木树苗在没有 2x2 阵型时仍消耗骨粉的问题。
+         */
+        public static boolean fixDarkOakSaplingBonemeal = true;
 
-    /**
-     * Fix bonemeal being consumed on plants at the world height limit
-     * (tall grass IGrowable check + ItemDye bonemeal interception).
-     * 修复世界高度上限处植物仍消耗骨粉的问题（草方块 IGrowable 判定 + ItemDye 骨粉拦截）。
-     */
-    public static boolean fixBonemealHeightLimit = true;
+        /**
+         * Fix bonemeal being consumed on plants at the world height limit
+         * (tall grass IGrowable check + ItemDye bonemeal interception).
+         * 修复世界高度上限处植物仍消耗骨粉的问题（草方块 IGrowable 判定 + ItemDye 骨粉拦截）。
+         */
+        public static boolean fixBonemealHeightLimit = true;
 
-    /**
-     * Fix MC-4: item entity position desync between client and server.
-     * 修复 MC-4：物品实体在客户端与服务端之间的位置不同步问题。
-     */
-    public static boolean fixItemPositionDesync = true;
+        /**
+         * Fix MC-4: item entity position desync between client and server.
+         * 修复 MC-4：物品实体在客户端与服务端之间的位置不同步问题。
+         */
+        public static boolean fixItemPositionDesync = true;
 
-    /**
-     * Fix NPE crash when hovering an ItemStack whose item is null
-     * (creative inventory fast tab switching race).
-     * 修复创造模式物品栏快速切换标签页时 ItemStack.hasEffect 的空指针崩溃。
-     */
-    public static boolean fixItemStackHasEffectNpe = true;
+        /**
+         * Fix NPE crash when hovering an ItemStack whose item is null
+         * (creative inventory fast tab switching race).
+         * 修复创造模式物品栏快速切换标签页时 ItemStack.hasEffect 的空指针崩溃。
+         */
+        public static boolean fixItemStackHasEffectNpe = true;
 
-    /**
-     * Block monster spawn eggs in peaceful mode and show a tooltip warning.
-     * 和平模式下阻止怪物蛋使用，并在 Tooltip 中显示警告。
-     */
-    public static boolean peacefulMonsterEggRestriction = true;
+        /**
+         * Block monster spawn eggs in peaceful mode and show a tooltip warning.
+         * 和平模式下阻止怪物蛋使用，并在 Tooltip 中显示警告。
+         */
+        public static boolean peacefulMonsterEggRestriction = true;
 
-    /**
-     * Fix bat wing animation float overflow when ageInTicks grows very large.
-     * 修复 ageInTicks 过大时蝙蝠翅膀动画的浮点溢出问题。
-     */
-    public static boolean fixBatWingAnimationOverflow = true;
+        /**
+         * Fix bat wing animation float overflow when ageInTicks grows very large.
+         * 修复 ageInTicks 过大时蝙蝠翅膀动画的浮点溢出问题。
+         */
+        public static boolean fixBatWingAnimationOverflow = true;
 
-    /**
-     * Clamp GuiSlot scroll amount to non-negative for short lists.
-     * 修复短列表时 GuiSlot 滚动量为负数的问题。
-     */
-    public static boolean fixGuiSlotNegativeScroll = true;
+        /**
+         * Clamp GuiSlot scroll amount to non-negative for short lists.
+         * 修复短列表时 GuiSlot 滚动量为负数的问题。
+         */
+        public static boolean fixGuiSlotNegativeScroll = true;
 
-    /**
-     * Block only the Alt+F4 window close request; the title-bar close button
-     * keeps working normally.
-     * 仅阻拦 Alt+F4 触发的窗口关闭请求；标题栏关闭按钮仍可正常退出。
-     */
-    public static boolean blockAltF4WindowClose = true;
+        /**
+         * Block only the Alt+F4 window close request; the title-bar close button
+         * keeps working normally.
+         * 仅阻拦 Alt+F4 触发的窗口关闭请求；标题栏关闭按钮仍可正常退出。
+         */
+        public static boolean blockAltF4WindowClose = true;
 
-    /**
-     * Keep background music playing across GUI switches: the pause menu no
-     * longer pauses/resumes the MusicTicker track, so opening or closing any
-     * GUI never interrupts the music.
-     * GUI 切换期间保持背景音乐持续播放：暂停菜单不再暂停/恢复 MusicTicker 曲目，
-     * 打开或关闭任何 GUI 都不会中断音乐。
-     */
-    public static boolean keepMusicDuringGuiSwitch = true;
+        /**
+         * Keep background music playing across GUI switches: the pause menu no
+         * longer pauses/resumes the MusicTicker track, so opening or closing any
+         * GUI never interrupts the music.
+         * GUI 切换期间保持背景音乐持续播放：暂停菜单不再暂停/恢复 MusicTicker 曲目，
+         * 打开或关闭任何 GUI 都不会中断音乐。
+         */
+        public static boolean keepMusicDuringGuiSwitch = true;
 
-    /**
-     * <p>
-     * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
-     * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
-     * </p>
-     * <p>
-     * Called from the mixin plugin during the coremod/launch phase, so only
-     * launch-safe classes (Forge Configuration, LaunchWrapper) may be used
-     * here.<br>
-     * 在 coremod/启动阶段由 Mixin 插件调用，因此这里只能使用启动期安全的类
-     * （Forge Configuration、LaunchWrapper）。
-     * </p>
-     */
-    public static void load() {
-        // Resolve the config dir from LaunchWrapper; fall back to the working directory
-        // in odd launch setups
-        // 通过 LaunchWrapper 定位配置目录；异常启动环境下回退到工作目录
-        File gameDir = Launch.minecraftHome != null ? Launch.minecraftHome : new File(".");
-        Configuration config = new Configuration(new File(gameDir, "config/bugfwxer.cfg"));
+        /**
+         * Fix MC-179165: releasing the mouse over a tab while dragging the
+         * creative inventory scrollbar no longer switches to that tab.
+         * 修复 MC-179165：拖动创造模式物品栏滚动条时，在标签上松开鼠标
+         * 不再误切换到该标签。
+         */
+        public static boolean fixCreativeScrollbarTabClick = true;
 
-        try {
-            config.load();
+        /**
+         * <p>
+         * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
+         * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
+         * </p>
+         * <p>
+         * Called from the mixin plugin during the coremod/launch phase, so only
+         * launch-safe classes (Forge Configuration, LaunchWrapper) may be used
+         * here.<br>
+         * 在 coremod/启动阶段由 Mixin 插件调用，因此这里只能使用启动期安全的类
+         * （Forge Configuration、LaunchWrapper）。
+         * </p>
+         */
+        public static void load() {
+                // Resolve the config dir from LaunchWrapper; fall back to the working directory
+                // in odd launch setups
+                // 通过 LaunchWrapper 定位配置目录；异常启动环境下回退到工作目录
+                File gameDir = Launch.minecraftHome != null ? Launch.minecraftHome : new File(".");
+                Configuration config = new Configuration(new File(gameDir, "config/bugfwxer.cfg"));
 
-            config.setCategoryComment(CATEGORY_FIXES,
-                    "Toggle individual bugfixes. All fixes are applied as mixins at class-load time,\n"
-                            + "so changes only take effect after a game restart.\n"
-                            + "逐项开关各个修复。所有修复均以 Mixin 形式在类加载时注入，修改后需重启游戏生效。");
+                try {
+                        config.load();
 
-            fixDarkOakSaplingBonemeal = config.getBoolean("fixDarkOakSaplingBonemeal", CATEGORY_FIXES, true,
-                    "Prevent dark oak saplings from consuming bonemeal without a valid 2x2 cluster.\n"
-                            + "防止黑橡木树苗在没有有效 2x2 阵型时白白消耗骨粉。");
+                        config.setCategoryComment(CATEGORY_FIXES,
+                                        "Toggle individual bugfixes. All fixes are applied as mixins at class-load time,\n"
+                                                        + "so changes only take effect after a game restart.\n"
+                                                        + "逐项开关各个修复。所有修复均以 Mixin 形式在类加载时注入，修改后需重启游戏生效。");
 
-            fixBonemealHeightLimit = config.getBoolean("fixBonemealHeightLimit", CATEGORY_FIXES, true,
-                    "Prevent bonemeal from being consumed on plants at the world height limit.\n"
-                            + "防止在世界高度上限处对植物使用骨粉时白白消耗骨粉。");
+                        fixDarkOakSaplingBonemeal = config.getBoolean("fixDarkOakSaplingBonemeal", CATEGORY_FIXES, true,
+                                        "Prevent dark oak saplings from consuming bonemeal without a valid 2x2 cluster.\n"
+                                                        + "防止黑橡木树苗在没有有效 2x2 阵型时白白消耗骨粉。");
 
-            fixItemPositionDesync = config.getBoolean("fixItemPositionDesync", CATEGORY_FIXES, true,
-                    "Fix MC-4: item entities visually desyncing between client and server near block edges.\n"
-                            + "修复 MC-4：物品实体在方块边缘处客户端与服务端位置不同步的问题。");
+                        fixBonemealHeightLimit = config.getBoolean("fixBonemealHeightLimit", CATEGORY_FIXES, true,
+                                        "Prevent bonemeal from being consumed on plants at the world height limit.\n"
+                                                        + "防止在世界高度上限处对植物使用骨粉时白白消耗骨粉。");
 
-            fixItemStackHasEffectNpe = config.getBoolean("fixItemStackHasEffectNpe", CATEGORY_FIXES, true,
-                    "Fix NPE crash from ItemStack.hasEffect when quickly switching creative inventory tabs.\n"
-                            + "修复创造模式物品栏快速切换标签页时 ItemStack.hasEffect 的空指针崩溃。");
+                        fixItemPositionDesync = config.getBoolean("fixItemPositionDesync", CATEGORY_FIXES, true,
+                                        "Fix MC-4: item entities visually desyncing between client and server near block edges.\n"
+                                                        + "修复 MC-4：物品实体在方块边缘处客户端与服务端位置不同步的问题。");
 
-            peacefulMonsterEggRestriction = config.getBoolean("peacefulMonsterEggRestriction", CATEGORY_FIXES, true,
-                    "Block monster spawn eggs in peaceful mode and show a tooltip warning.\n"
-                            + "和平模式下阻止使用怪物刷怪蛋，并在物品提示中显示警告。");
+                        fixItemStackHasEffectNpe = config.getBoolean("fixItemStackHasEffectNpe", CATEGORY_FIXES, true,
+                                        "Fix NPE crash from ItemStack.hasEffect when quickly switching creative inventory tabs.\n"
+                                                        + "修复创造模式物品栏快速切换标签页时 ItemStack.hasEffect 的空指针崩溃。");
 
-            fixBatWingAnimationOverflow = config.getBoolean("fixBatWingAnimationOverflow", CATEGORY_FIXES, true,
-                    "Fix bat wing animation freezing/jittering after very long world uptime (float overflow). Client only.\n"
-                            + "修复世界运行时间过长后蝙蝠翅膀动画卡住/抖动的浮点溢出问题。仅客户端。");
+                        peacefulMonsterEggRestriction = config.getBoolean("peacefulMonsterEggRestriction",
+                                        CATEGORY_FIXES, true,
+                                        "Block monster spawn eggs in peaceful mode and show a tooltip warning.\n"
+                                                        + "和平模式下阻止使用怪物刷怪蛋，并在物品提示中显示警告。");
 
-            fixGuiSlotNegativeScroll = config.getBoolean("fixGuiSlotNegativeScroll", CATEGORY_FIXES, true,
-                    "Clamp GUI list scroll amount to non-negative when the list is shorter than the view. Client only.\n"
-                            + "当列表内容不足一屏时，将 GUI 列表滚动量钳制为非负值。仅客户端。");
+                        fixBatWingAnimationOverflow = config.getBoolean("fixBatWingAnimationOverflow", CATEGORY_FIXES,
+                                        true,
+                                        "Fix bat wing animation freezing/jittering after very long world uptime (float overflow). Client only.\n"
+                                                        + "修复世界运行时间过长后蝙蝠翅膀动画卡住/抖动的浮点溢出问题。仅客户端。");
 
-            blockAltF4WindowClose = config.getBoolean("blockAltF4WindowClose", CATEGORY_FIXES, true,
-                    "Block only the Alt+F4 window close request; the title-bar close button still works. Client only.\n"
-                            + "仅阻拦 Alt+F4 触发的窗口关闭请求；标题栏关闭按钮仍可正常退出。仅客户端。");
+                        fixGuiSlotNegativeScroll = config.getBoolean("fixGuiSlotNegativeScroll", CATEGORY_FIXES, true,
+                                        "Clamp GUI list scroll amount to non-negative when the list is shorter than the view. Client only.\n"
+                                                        + "当列表内容不足一屏时，将 GUI 列表滚动量钳制为非负值。仅客户端。");
 
-            keepMusicDuringGuiSwitch = config.getBoolean("keepMusicDuringGuiSwitch", CATEGORY_FIXES, true,
-                    "Keep background music playing across GUI switches; the pause menu no longer interrupts the track. Client only.\n"
-                            + "GUI 切换期间保持背景音乐持续播放，暂停菜单不再中断音乐。仅客户端。");
-        } finally {
-            // Persist defaults / newly added keys back to disk
-            // 将默认值或新增键写回磁盘
-            if (config.hasChanged()) {
-                config.save();
-            }
+                        blockAltF4WindowClose = config.getBoolean("blockAltF4WindowClose", CATEGORY_FIXES, true,
+                                        "Block only the Alt+F4 window close request; the title-bar close button still works. Client only.\n"
+                                                        + "仅阻拦 Alt+F4 触发的窗口关闭请求；标题栏关闭按钮仍可正常退出。仅客户端。");
+
+                        keepMusicDuringGuiSwitch = config.getBoolean("keepMusicDuringGuiSwitch", CATEGORY_FIXES, true,
+                                        "Keep background music playing across GUI switches; the pause menu no longer interrupts the track. Client only.\n"
+                                                        + "GUI 切换期间保持背景音乐持续播放，暂停菜单不再中断音乐。仅客户端。");
+
+                        fixCreativeScrollbarTabClick = config.getBoolean("fixCreativeScrollbarTabClick", CATEGORY_FIXES,
+                                        true,
+                                        "Fix MC-179165: releasing the mouse over a creative inventory tab while dragging the scrollbar no longer switches to that tab. Client only.\n"
+                                                        + "修复 MC-179165：拖动创造模式物品栏滚动条时，在标签上松开鼠标不再误切换到该标签。仅客户端。");
+                } finally {
+                        // Persist defaults / newly added keys back to disk
+                        // 将默认值或新增键写回磁盘
+                        if (config.hasChanged()) {
+                                config.save();
+                        }
+                }
         }
-    }
 }

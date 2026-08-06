@@ -27,14 +27,18 @@ import java.util.Map;
  * 打开/关闭暂停菜单不再让 MusicTicker 曲目经历 paulscode 流式暂停/恢复的往返——
  * 正是该往返导致音乐中断并留下 10~20 分钟的音乐静默。
  *
- * <p>Implementation note: the music entries are temporarily removed from
+ * <p>
+ * Implementation note: the music entries are temporarily removed from
  * {@code playingSounds} before the vanilla loop runs (HEAD) and put back
  * afterwards (TAIL). Because the map is a Guava HashBiMap the inverse map is
  * maintained automatically, and the vanilla code simply never sees the music
- * channel ids, so it cannot pause/resume them.</p>
- * <p>实现说明：在原版遍历（HEAD）之前把音乐条目临时从 {@code playingSounds}
+ * channel ids, so it cannot pause/resume them.
+ * </p>
+ * <p>
+ * 实现说明：在原版遍历（HEAD）之前把音乐条目临时从 {@code playingSounds}
  * 中移除，遍历结束（TAIL）再放回。由于该映射是 Guava HashBiMap，反向映射会
- * 自动同步维护，原版代码根本看不到音乐声道 id，自然无法暂停/恢复它们。</p>
+ * 自动同步维护，原版代码根本看不到音乐声道 id，自然无法暂停/恢复它们。
+ * </p>
  *
  * @author Seniye
  */
