@@ -2,6 +2,7 @@ package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.client.gui;
 
 import java.util.Random;
 import net.minecraft.client.gui.FontRenderer;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -118,6 +119,11 @@ public abstract class MixinFontRenderer {
         throw new UnsupportedOperationException();
     }
 
+    @Shadow
+    private void loadGlyphTexture(int p_78257_1_) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * @author Seniye
      * @reason Trailing lone formatting code must consume zero width, matching
@@ -204,6 +210,16 @@ public abstract class MixinFontRenderer {
      *         renderUnicodeChar 的实际推进宽度不符（例如测量 8 而实际只推进 5），导致这类
      *         字形居中对齐与换行错位。现改为直接使用渲染推进宽度 (k - j + 1) / 2 + 1，
      *         对应现代版 Font 由绘制所用 advance 推导 width() 的做法。
+     *         <p>
+     *         Fix: the glyphWidth start nibble was read through a sign-extended
+     *         {@code >>> 4}; glyphs whose byte value is &ge; 0x80 (narrow full-width
+     *         punctuation such as U+FF08 （) yielded a huge start column and a
+     *         negative width, so they were measured like a formatting code. Masking
+     *         with {@code & 0xFF} restores the intended 0..15 nibble.<br>
+     *         修复：glyphWidth 起始列的 {@code >>> 4} 读取存在符号扩展问题，字节值
+     *         &ge; 0x80 的窄全角标点（如 U+FF08 （）会被解析为巨大的起始列与负宽度，
+     *         在测量时被当作格式码处理。以 {@code & 0xFF} 屏蔽符号位后恢复 0..15 的
+     *         正确 nibble 范围。
      *         </p>
      */
     @Overwrite
@@ -219,7 +235,12 @@ public abstract class MixinFontRenderer {
             if (p_78263_1_ > 0 && i != -1 && !this.unicodeFlag) {
                 return this.charWidth[i];
             } else if (this.glyphWidth[p_78263_1_] != 0) {
-                int j = this.glyphWidth[p_78263_1_] >>> 4;
+                // The byte[] nibble must be read unsigned: glyphs >= 0x80 (e.g.
+                // U+FF08 = 0x9C) would otherwise sign-extend into a ~268M start
+                // column and a negative width (see @reason).
+                // byte[] nibble 必须按无符号读取：>= 0x80 的字形（如 U+FF08 = 0x9C）
+                // 会被符号扩展成约 2.68 亿的起始列与负宽度（见 @reason）。
+                int j = (this.glyphWidth[p_78263_1_] & 255) >>> 4;
                 int k = this.glyphWidth[p_78263_1_] & 15;
                 ++k;
                 // Matches the truncated advance of renderUnicodeChar: (int)((k + 1 - j) / 2.0F
@@ -229,6 +250,64 @@ public abstract class MixinFontRenderer {
             } else {
                 return 0;
             }
+        }
+    }
+
+    /**
+     * @author Seniye
+     * @reason Unsigned glyphWidth nibble read makes narrow full-width
+     *         punctuation (（）｛｝｜) render instead of vanishing and pushing
+     *         the rest of the line off-screen
+     *         Render a single Unicode character at current (posX,posY) location
+     *         using one of the /font/unicode_page_XX.png files.
+     *         在当前 (posX,posY) 位置使用 unicode_page_XX.png 渲染单个 Unicode 字符。
+     *         <p>
+     *         Fix: glyphWidth is a {@code byte[]}, so any glyph whose byte value
+     *         is &ge; 0x80 (a narrow glyph starting past column 8, e.g.
+     *         U+FF08 = 0x9C) was sign-extended before {@code >>> 4}, producing a
+     *         start column of 268435449. The glyph was then sampled from a
+     *         garbage texture coordinate (invisible), the quad spanned
+     *         -134217721 px, and the returned advance {@code (k - j) / 2 + 1}
+     *         was -134217717 px, rendering every following character far
+     *         off-screen. Reading the nibble unsigned ({@code & 0xFF}) restores
+     *         the intended 0..15 range.<br>
+     *         修复：glyphWidth 是 {@code byte[]}，字节值 &ge; 0x80 的字形（第 8 列
+     *         之后才起笔的窄字形，如 U+FF08 = 0x9C）在 {@code >>> 4} 前被符号扩展，
+     *         起始列变成 268435449：字形采样到错误的纹理坐标（不可见），四边形宽度为
+     *         -134217721px，且返回的推进宽度 {@code (k - j) / 2 + 1} 为
+     *         -134217717px，其后所有字符都被渲染到屏幕之外。按无符号
+     *         （{@code & 0xFF}）读取 nibble 即可恢复 0..15 的正确范围。
+     *         </p>
+     */
+    @Overwrite
+    protected float renderUnicodeChar(char p_78277_1_, boolean p_78277_2_) {
+        if (this.glyphWidth[p_78277_1_] == 0) {
+            return 0.0F;
+        } else {
+            int i = p_78277_1_ / 256;
+            this.loadGlyphTexture(i);
+            // The byte[] nibble must be read unsigned: glyphs >= 0x80 would
+            // otherwise sign-extend into a ~268M start column (see @reason).
+            // byte[] nibble 必须按无符号读取：>= 0x80 的字形会被符号扩展成约 2.68 亿的起始列。
+            int j = (this.glyphWidth[p_78277_1_] & 255) >>> 4;
+            int k = this.glyphWidth[p_78277_1_] & 15;
+            float f = (float) j;
+            float f1 = (float) (k + 1);
+            float f2 = (float) (p_78277_1_ % 16 * 16) + f;
+            float f3 = (float) ((p_78277_1_ & 255) / 16 * 16);
+            float f4 = f1 - f - 0.02F;
+            float f5 = p_78277_2_ ? 1.0F : 0.0F;
+            GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+            GL11.glTexCoord2f(f2 / 256.0F, f3 / 256.0F);
+            GL11.glVertex3f(this.posX + f5, this.posY, 0.0F);
+            GL11.glTexCoord2f(f2 / 256.0F, (f3 + 15.98F) / 256.0F);
+            GL11.glVertex3f(this.posX - f5, this.posY + 7.99F, 0.0F);
+            GL11.glTexCoord2f((f2 + f4) / 256.0F, f3 / 256.0F);
+            GL11.glVertex3f(this.posX + f4 / 2.0F + f5, this.posY, 0.0F);
+            GL11.glTexCoord2f((f2 + f4) / 256.0F, (f3 + 15.98F) / 256.0F);
+            GL11.glVertex3f(this.posX + f4 / 2.0F - f5, this.posY + 7.99F, 0.0F);
+            GL11.glEnd();
+            return (f1 - f) / 2.0F + 1.0F;
         }
     }
 
