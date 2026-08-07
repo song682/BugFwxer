@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.bugfwxer.mixins.middle.minecraft.audio;
+package decok.dfcdvadstf.bugfwxer.mixins.early.minecraft.audio;
 
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.SoundCategory;

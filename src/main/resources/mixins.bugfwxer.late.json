@@ -1,0 +1,8 @@
+{
+    "package": "decok.dfcdvadstf.bugfwxer.mixins.late",
+    "compatibilityLevel": "JAVA_8",
+    "target": "@env(DEFAULT)",
+    "refmap": "mixins.bugfwxer.refmap.json",
+    "required": true,
+    "minVersion": "0.8.5"
+}

@@ -197,7 +197,16 @@ if (project.enableUsingMixin.toBoolean()) {
     }
 }
 
-if (project.enableUsingMysteriumLib.toBoolean()) {
+// FMLCorePlugin manifest attribute registers the GTNH early-mixin coremod
+// (EarlyMixinPlugin, stored in patchClass). It must be present whenever the
+// early mixin channel is used, not only when MysteriumLib is enabled —
+// UniMixins discovers IEarlyMixinLoader implementations through the FML
+// coremod list, and without this attribute the coremod is never instantiated.
+// FMLCorePlugin manifest 属性用于注册 GTNH early-mixin coremod
+// （EarlyMixinPlugin，其类名存放在 patchClass）。只要使用 early mixin 通道
+// 就必须存在该属性，而不仅仅是在启用 MysteriumLib 时——UniMixins 通过 FML
+// coremod 列表发现 IEarlyMixinLoader 实现，缺少该属性 coremod 永远不会被实例化。
+if (project.enableUsingMixin.toBoolean() || project.enableUsingMysteriumLib.toBoolean()) {
     jar {
         manifest {
             attributes 'FMLCorePlugin': "${project.patchClass}"

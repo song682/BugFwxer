@@ -1,25 +1,9 @@
 {
-  "package": "decok.dfcdvadstf.bugfwxer.mixins",
+  "package": "decok.dfcdvadstf.bugfwxer.mixins.middle",
   "compatibilityLevel": "JAVA_8",
+  "target": "@env(DEFAULT)",
   "refmap": "mixins.bugfwxer.refmap.json",
   "plugin": "decok.dfcdvadstf.bugfwxer.mixins.MixinPlugin",
-  "mixins": [
-    "middle.minecraft.block.MixinBlockSapling",
-    "middle.minecraft.block.MixinBlockTallGrass",
-    "middle.minecraft.item.MixinItemDye",
-    "middle.minecraft.entity.MixinEntityItem",
-    "middle.minecraft.item.MixinItemMonsterPlacer",
-    "middle.minecraft.item.MixinItemStack"
-  ],
-  "client": [
-    "middle.minecraft.entity.MixinEntityBat",
-    "middle.minecraft.client.gui.MixinGuiSlot",
-    "middle.minecraft.client.gui.MixinGuiContainerCreative",
-    "middle.minecraft.client.gui.MixinFontRenderer",
-    "middle.minecraft.audio.MixinSoundManager",
-    "middle.minecraft.audio.MixinMusicTicker",
-    "early.minecraft.client.MixinMinecraft"
-  ],
   "required": true,
-  "minVersion": "0.7.11"
+  "minVersion": "0.8.5"
 }
