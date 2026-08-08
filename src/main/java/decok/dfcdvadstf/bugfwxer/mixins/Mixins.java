@@ -62,6 +62,18 @@ public enum Mixins implements IMixins {
             .addClientMixins("minecraft.audio.MixinSoundManager", "minecraft.audio.MixinMusicTicker")
             .setApplyIf(() -> BugFwxerConfig.keepMusicDuringGuiSwitch)),
 
+    /**
+     * Fire Forge's village InitMapGenEvent inside ChunkProviderFlat so mods
+     * that replace the village generator (e.g. VillageNames) take over in
+     * superflat worlds, where the event is otherwise never posted.
+     * 在 ChunkProviderFlat 中触发村庄 InitMapGenEvent，使替换村庄生成器的模组
+     * （如 VillageNames）能在超平坦世界中接管——否则该事件永远不会被发布。
+     */
+    FIX_VILLAGENAMES_FLAT_WORLD_VILLAGES(new MixinBuilder("Fire InitMapGenEvent for superflat village generation")
+            .setPhase(Phase.EARLY)
+            .addCommonMixins("minecraft.world.gen.MixinChunkProviderFlat")
+            .setApplyIf(() -> BugFwxerConfig.fixVillageNamesFlatWorldVillages)),
+
     // ------------------------------------------------------------------
     // Default phase — registered by the main mixins.bugfwxer.json plugin
     // during the tweak/launch stage; enough for classes loaded later in

@@ -106,6 +106,15 @@ public class BugFwxerConfig {
         public static boolean fixFontRendererLogic = true;
 
         /**
+         * Fix villages not spawning in superflat worlds when VillageNames is
+         * installed: ChunkProviderFlat never fires InitMapGenEvent, so the mod's
+         * {@code MapGenVillageVN} is swapped in directly after construction.
+         * 修复安装 VillageNames 后超平坦世界不生成村庄的问题：ChunkProviderFlat
+         * 从不触发 InitMapGenEvent，改为在构造完成后直接替换为该模组的生成器。
+         */
+        public static boolean fixVillageNamesFlatWorldVillages = true;
+
+        /**
          * <p>
          * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
          * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
@@ -179,6 +188,11 @@ public class BugFwxerConfig {
                         fixFontRendererLogic = config.getBoolean("fixFontRendererLogic", CATEGORY_FIXES, true,
                                         "Fix FontRenderer logic: unicode width matches the rendered advance, overflowing first chars no longer crash word wrap (StackOverflowError), trailing format codes cost no width, and the obfuscated style can no longer hang the game. Client only.\n"
                                                         + "修复 FontRenderer 逻辑：unicode 宽度与实际渲染推进一致、超宽首字符不再导致换行崩溃（StackOverflowError）、末尾格式码不占宽度、乱码样式不再卡死游戏。仅客户端。");
+
+                        fixVillageNamesFlatWorldVillages = config.getBoolean("fixVillageNamesFlatWorldVillages",
+                                        CATEGORY_FIXES, true,
+                                        "Fix villages not spawning in superflat worlds when VillageNames is installed: ChunkProviderFlat never fires InitMapGenEvent, so the mod's village generator is swapped in directly. Requires VillageNames.\n"
+                                                        + "修复安装 VillageNames 后超平坦世界不生成村庄的问题：ChunkProviderFlat 从不触发 InitMapGenEvent，改为直接替换为该模组的村庄生成器。需要安装 VillageNames。");
                 } finally {
                         // Persist defaults / newly added keys back to disk
                         // 将默认值或新增键写回磁盘

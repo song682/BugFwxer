@@ -89,6 +89,7 @@ dependencies {
     runtimeOnly "maven.modrinth:notenoughitems-unofficial:${project.nei_version}-GTNH"
     runtimeOnly "maven.modrinth:codechickencore-unofficial:${project.cc_version}"
     runtimeOnly "maven.modrinth:codechickenlib-unofficial:${project.cc_version}"
+    compileOnly "maven.modrinth:village-names:4.4.13-1.7"
     compileOnly "com.github.song682:CatFrame:v0.6.0"
 
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
