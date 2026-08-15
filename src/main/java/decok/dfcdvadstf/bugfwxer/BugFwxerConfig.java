@@ -126,6 +126,17 @@ public class BugFwxerConfig {
         public static boolean audioOutputDeviceSwitch = true;
 
         /**
+         * Fix paulscode's OGG decoder (CodecJOrbis#readAll) reallocating and
+         * copying the whole accumulated buffer for every ~16 KB chunk while
+         * holding the global sound lock, which stalled the sound system when a
+         * large sound was first played. Client only.
+         * 修复 paulscode 的 OGG 解码器（CodecJOrbis#readAll）每解码一个约
+         * 16KB 块就整体重新分配复制累计缓冲、且全程持有声音全局锁的问题，
+         * 该问题会在首次播放大型音效时使整个声音系统卡顿。仅客户端。
+         */
+        public static boolean fixOggDecodeQuadraticCopy = true;
+
+        /**
          * <p>
          * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
          * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
@@ -208,6 +219,11 @@ public class BugFwxerConfig {
                         audioOutputDeviceSwitch = config.getBoolean("audioOutputDeviceSwitch", CATEGORY_FIXES, true,
                                         "Filter virtual/recording audio devices, fix device-name encoding at the JavaSound API level, and add an audio output device switcher button to the sound settings GUI. Client only.\n"
                                                         + "过滤虚拟/录音音频设备、修复 JavaSound API 层面的设备名编码，并在声音设置界面添加音频输出设备切换按钮。仅客户端。");
+
+                        fixOggDecodeQuadraticCopy = config.getBoolean("fixOggDecodeQuadraticCopy", CATEGORY_FIXES,
+                                        true,
+                                        "Fix paulscode's OGG decoder reallocating and copying the whole accumulated buffer for every ~16 KB chunk while holding the global sound lock, which stalled the sound system when a large sound was first played. Client only.\n"
+                                                        + "修复 paulscode 的 OGG 解码器每解码一个约 16KB 块就整体重新分配复制累计缓冲、且全程持有声音全局锁的问题，该问题会在首次播放大型音效时使整个声音系统卡顿。仅客户端。");
                 } finally {
                         // Persist defaults / newly added keys back to disk
                         // 将默认值或新增键写回磁盘

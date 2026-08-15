@@ -185,7 +185,20 @@ public enum Mixins implements IMixins {
     AUDIO_OUTPUT_DEVICE_SWITCHER(new MixinBuilder("Audio output device switcher")
             .addClientMixins("minecraft.audio.MixinSoundManagerJavaSound",
                     "minecraft.client.gui.GuiScreenOptionsSoundsMixin")
-            .setApplyIf(() -> BugFwxerConfig.audioOutputDeviceSwitch));
+            .setApplyIf(() -> BugFwxerConfig.audioOutputDeviceSwitch)),
+
+    /**
+     * Fix paulscode's OGG decoder (CodecJOrbis#readAll) reallocating and
+     * copying the whole accumulated buffer for every ~16 KB decoded chunk
+     * while holding the global sound lock, which stalled the sound system
+     * when a large sound was first played.
+     * 修复 paulscode 的 OGG 解码器（CodecJOrbis#readAll）每解码一个约 16KB
+     * 块就整体重新分配复制累计缓冲、且全程持有声音全局锁的问题，
+     * 该问题会在首次播放大型音效时使整个声音系统卡顿。
+     */
+    FIX_OGG_DECODE_QUADRATIC_COPY(new MixinBuilder("Fix paulscode OGG decode quadratic copy")
+            .addClientMixins("java.MixinCodecJOrbis")
+            .setApplyIf(() -> BugFwxerConfig.fixOggDecodeQuadraticCopy));
 
     /** The builder describing this mixin entry. 描述该 Mixin 条目的构建器。 */
     private final MixinBuilder builder;
