@@ -198,7 +198,19 @@ public enum Mixins implements IMixins {
      */
     FIX_OGG_DECODE_QUADRATIC_COPY(new MixinBuilder("Fix paulscode OGG decode quadratic copy")
             .addClientMixins("java.MixinCodecJOrbis")
-            .setApplyIf(() -> BugFwxerConfig.fixOggDecodeQuadraticCopy));
+            .setApplyIf(() -> BugFwxerConfig.fixOggDecodeQuadraticCopy)),
+
+    /**
+     * Raise paulscode's channel counts from the 1.7.10 defaults (28 normal + 4
+     * streaming) to the modern Minecraft standard (120 normal + 8 streaming),
+     * reducing sounds being cut off or dropped when many effects play at once.
+     * 将 paulscode 声道数从 1.7.10 默认值（28 普通 + 4 流式）提升到现代
+     * Minecraft 标准（120 普通 + 8 流式），减少多个音效同时播放时
+     * 声音被截断或丢失的问题。
+     */
+    MODERN_SOUND_CHANNEL_COUNTS(new MixinBuilder("Use modern sound channel counts")
+            .addClientMixins("minecraft.audio.MixinSoundManagerChannels")
+            .setApplyIf(() -> BugFwxerConfig.modernSoundChannelCounts));
 
     /** The builder describing this mixin entry. 描述该 Mixin 条目的构建器。 */
     private final MixinBuilder builder;

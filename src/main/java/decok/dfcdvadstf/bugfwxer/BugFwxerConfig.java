@@ -137,6 +137,17 @@ public class BugFwxerConfig {
         public static boolean fixOggDecodeQuadraticCopy = true;
 
         /**
+         * Raise paulscode's channel counts from the 1.7.10 defaults (28 normal
+         * + 4 streaming) to the modern Minecraft standard (120 normal + 8
+         * streaming), reducing sounds being cut off or dropped when many
+         * effects play at once. Client only.
+         * 将 paulscode 声道数从 1.7.10 默认值（28 普通 + 4 流式）提升到现代
+         * Minecraft 标准（120 普通 + 8 流式），减少多个音效同时播放时
+         * 声音被截断或丢失的问题。仅客户端。
+         */
+        public static boolean modernSoundChannelCounts = true;
+
+        /**
          * <p>
          * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
          * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
@@ -224,6 +235,11 @@ public class BugFwxerConfig {
                                         true,
                                         "Fix paulscode's OGG decoder reallocating and copying the whole accumulated buffer for every ~16 KB chunk while holding the global sound lock, which stalled the sound system when a large sound was first played. Client only.\n"
                                                         + "修复 paulscode 的 OGG 解码器每解码一个约 16KB 块就整体重新分配复制累计缓冲、且全程持有声音全局锁的问题，该问题会在首次播放大型音效时使整个声音系统卡顿。仅客户端。");
+
+                        modernSoundChannelCounts = config.getBoolean("modernSoundChannelCounts", CATEGORY_FIXES,
+                                        true,
+                                        "Raise paulscode's channel counts from the 1.7.10 defaults (28 normal + 4 streaming) to the modern Minecraft standard (120 normal + 8 streaming), reducing sounds being cut off or dropped when many effects play at once. Client only.\n"
+                                                        + "将 paulscode 声道数从 1.7.10 默认值（28 普通 + 4 流式）提升到现代 Minecraft 标准（120 普通 + 8 流式），减少多个音效同时播放时声音被截断或丢失的问题。仅客户端。");
                 } finally {
                         // Persist defaults / newly added keys back to disk
                         // 将默认值或新增键写回磁盘
