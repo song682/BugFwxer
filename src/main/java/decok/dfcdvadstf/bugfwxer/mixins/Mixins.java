@@ -211,7 +211,19 @@ public enum Mixins implements IMixins {
      */
     MODERN_SOUND_CHANNEL_COUNTS(new MixinBuilder("Use modern sound channel counts")
             .addClientMixins("minecraft.audio.MixinSoundManagerChannels")
-            .setApplyIf(() -> BugFwxerConfig.modernSoundChannelCounts));
+            .setApplyIf(() -> BugFwxerConfig.modernSoundChannelCounts)),
+
+    /**
+     * Expose a public API (BugFwxerSoundApi#getChannelUsage) reporting the
+     * current paulscode sound channel usage (normal and streaming: total,
+     * in-use and playing counts) to external mods. Always on: this is a pure
+     * read-only API port with no player-facing toggle.<br>
+     * 提供公开 API（BugFwxerSoundApi#getChannelUsage）向外部模组报告当前
+     * paulscode 声道使用情况（普通与流式：总数、占用数、播放中数）。
+     * 始终启用：这是纯只读 API 传输口，不设玩家开关。
+     */
+    SOUND_CHANNEL_USAGE_API(new MixinBuilder("Expose sound channel usage API")
+            .addClientMixins("java.MixinLibraryChannelUsage"));
 
     /** The builder describing this mixin entry. 描述该 Mixin 条目的构建器。 */
     private final MixinBuilder builder;
