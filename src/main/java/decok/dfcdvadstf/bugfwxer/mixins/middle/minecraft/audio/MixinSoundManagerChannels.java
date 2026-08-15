@@ -14,21 +14,26 @@ import paulscode.sound.SoundSystemConfig;
  * <p>
  * MixinSoundManagerChannels<br>
  * Raises paulscode's channel counts from the 1.7.10 defaults (28 normal + 4
- * streaming) to the modern Minecraft standard (120 normal + 8 streaming),
+ * streaming) to the modern Minecraft standard (247 normal + 8 streaming),
  * which reduces sounds being cut off or dropped when many effects play at
  * once.<br>
  * 将 paulscode 的声道数从 1.7.10 默认值（28 普通 + 4 流式）提升到现代
- * Minecraft 标准（120 普通 + 8 流式），减少多个音效同时播放时
+ * Minecraft 标准（247 普通 + 8 流式），减少多个音效同时播放时
  * 声音被截断或丢失的问题。
  * </p>
  * <p>
  * Minecraft 1.8+ applies exactly these numbers in its own SoundManager; the
- * same values are safe here. paulscode creates as many channels as the backend
- * can provide when it cannot create all of them, so limited drivers never
- * crash, they just cap the concurrency.<br>
- * Minecraft 1.8+ 的 SoundManager 正是使用这组数值；此处沿用同样安全。
- * 当后端无法创建全部声道时 paulscode 会尽量多建，因此驱动受限时不会崩溃，
- * 只是并发声道数被封顶。
+ * same values are safe here (247 + 8 = 255, within the 256 sources that
+ * OpenAL Soft guarantees). paulscode creates as many channels as the backend
+ * can provide when it cannot create all of them, and ChannelJavaSound only
+ * opens its Clip when a sound is actually played, so the 247 normal channels
+ * are cheap idle objects and limited drivers never crash, they just cap the
+ * concurrency.<br>
+ * Minecraft 1.8+ 的 SoundManager 正是使用这组数值；此处沿用同样安全
+ * （247 + 8 = 255，在 OpenAL Soft 保证的 256 个声源之内）。当后端无法
+ * 创建全部声道时 paulscode 会尽量多建，且 ChannelJavaSound 仅在真正播放
+ * 时才打开 Clip，因此 247 个普通声道只是廉价的空闲对象，驱动受限时
+ * 不会崩溃，只是并发声道数被封顶。
  * </p>
  *
  * @author Seniye
@@ -37,10 +42,11 @@ import paulscode.sound.SoundSystemConfig;
 public abstract class MixinSoundManagerChannels {
 
     /**
-     * Normal (non-streaming) channel count used by modern Minecraft.
-     * 现代 Minecraft 使用的普通声道数。
+     * Normal (non-streaming) channel count used by modern Minecraft, matching
+     * the vanilla 1.8+ SoundManager. 现代 Minecraft（原版 1.8+ SoundManager）
+     * 使用的普通声道数。
      */
-    private static final int MODERN_NORMAL_CHANNELS = 120;
+    private static final int MODERN_NORMAL_CHANNELS = 247;
 
     /**
      * Streaming channel count used by modern Minecraft.
