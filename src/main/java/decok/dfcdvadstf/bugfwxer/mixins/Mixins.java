@@ -74,6 +74,18 @@ public enum Mixins implements IMixins {
             .addCommonMixins("minecraft.world.gen.MixinChunkProviderFlat")
             .setApplyIf(() -> BugFwxerConfig.fixVillageNamesFlatWorldVillages)),
 
+    /**
+     * Filter virtual/recording audio devices and fix device-name encoding at
+     * the JavaSound API level (AudioSystem#getMixerInfo), so the audio output
+     * device switcher sees a clean, readable device list.
+     * 在 JavaSound API 层面（AudioSystem#getMixerInfo）过滤虚拟/录音设备并
+     * 修复设备名编码，让音频输出设备切换器拿到干净可读的设备列表。
+     */
+    AUDIO_DEVICE_LIST_CLEANUP(new MixinBuilder("Clean up the JavaSound device list")
+            .setPhase(Phase.EARLY)
+            .addClientMixins("java.MixinAudioSystem")
+            .setApplyIf(() -> BugFwxerConfig.audioOutputDeviceSwitch)),
+
     // ------------------------------------------------------------------
     // Default phase — registered by the main mixins.bugfwxer.json plugin
     // during the tweak/launch stage; enough for classes loaded later in
@@ -159,7 +171,21 @@ public enum Mixins implements IMixins {
      */
     FIX_FONT_RENDERER_LOGIC(new MixinBuilder("Fix FontRenderer logic")
             .addClientMixins("minecraft.client.gui.MixinFontRenderer")
-            .setApplyIf(() -> BugFwxerConfig.fixFontRendererLogic));
+            .setApplyIf(() -> BugFwxerConfig.fixFontRendererLogic)),
+
+    /**
+     * Add an audio output device switcher button to the sound settings GUI:
+     * SoundManager prefers paulscode LibraryJavaSound (so switching the mixer
+     * actually reroutes every channel), and GuiScreenOptionsSounds gets a
+     * button that cycles through the detected output devices.
+     * 在声音设置界面添加音频输出设备切换按钮：SoundManager 优先使用 paulscode
+     * LibraryJavaSound（这样切换混音器才能真正改道所有声道），
+     * GuiScreenOptionsSounds 上新增一个循环切换检测到的输出设备的按钮。
+     */
+    AUDIO_OUTPUT_DEVICE_SWITCHER(new MixinBuilder("Audio output device switcher")
+            .addClientMixins("minecraft.audio.MixinSoundManagerJavaSound",
+                    "minecraft.client.gui.GuiScreenOptionsSoundsMixin")
+            .setApplyIf(() -> BugFwxerConfig.audioOutputDeviceSwitch));
 
     /** The builder describing this mixin entry. 描述该 Mixin 条目的构建器。 */
     private final MixinBuilder builder;

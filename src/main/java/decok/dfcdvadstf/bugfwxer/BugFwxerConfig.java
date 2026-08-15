@@ -115,6 +115,17 @@ public class BugFwxerConfig {
         public static boolean fixVillageNamesFlatWorldVillages = true;
 
         /**
+         * Filter virtual/recording audio devices and fix device-name encoding
+         * at the JavaSound API level, plus add an audio output device switcher
+         * button to the sound settings GUI (switches via paulscode
+         * LibraryJavaSound#setMixer). Client only.
+         * 在 JavaSound API 层面过滤虚拟/录音设备并修复设备名编码，
+         * 同时在声音设置界面添加音频输出设备切换按钮
+         * （通过 paulscode LibraryJavaSound#setMixer 切换）。仅客户端。
+         */
+        public static boolean audioOutputDeviceSwitch = true;
+
+        /**
          * <p>
          * Load (and create on first run) {@code config/bugfwxer.cfg}.<br>
          * 加载（首次运行时创建）{@code config/bugfwxer.cfg}。
@@ -193,6 +204,10 @@ public class BugFwxerConfig {
                                         CATEGORY_FIXES, true,
                                         "Fix villages not spawning in superflat worlds when VillageNames is installed: ChunkProviderFlat never fires InitMapGenEvent, so the mod's village generator is swapped in directly. Requires VillageNames.\n"
                                                         + "修复安装 VillageNames 后超平坦世界不生成村庄的问题：ChunkProviderFlat 从不触发 InitMapGenEvent，改为直接替换为该模组的村庄生成器。需要安装 VillageNames。");
+
+                        audioOutputDeviceSwitch = config.getBoolean("audioOutputDeviceSwitch", CATEGORY_FIXES, true,
+                                        "Filter virtual/recording audio devices, fix device-name encoding at the JavaSound API level, and add an audio output device switcher button to the sound settings GUI. Client only.\n"
+                                                        + "过滤虚拟/录音音频设备、修复 JavaSound API 层面的设备名编码，并在声音设置界面添加音频输出设备切换按钮。仅客户端。");
                 } finally {
                         // Persist defaults / newly added keys back to disk
                         // 将默认值或新增键写回磁盘

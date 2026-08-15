@@ -1,6 +1,7 @@
-package decok.dfcdvadstf.soundswitcher.audio;
+package decok.dfcdvadstf.bugfwxer.audio;
 
-import decok.dfcdvadstf.soundswitcher.SoundSwitcher;
+import decok.dfcdvadstf.bugfwxer.BugFwxer;
+import net.minecraft.launchwrapper.Launch;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -11,13 +12,24 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 音频设备监控器
+ * <p>
+ * Audio device monitor.<br>
+ * 音频设备监控器。
+ * </p>
+ * <p>
+ * Uses the same JavaSound API as the bundled audio libraries (paulscode,
+ * IBXM) to detect audio output devices in real time, drives the output device
+ * switcher button in the sound settings GUI, and logs device changes to a
+ * dedicated file under the game's logs directory.<br>
  * 利用项目中已有的音频库（paulscode、IBXM）使用的 JavaSound API
- * 实时检测系统中接入的音频输出设备
- * 不显示在游戏内，而是记录到独立的日志文件
+ * 实时检测系统中接入的音频输出设备，驱动声音设置界面中的输出设备切换按钮，
+ * 并把设备变化记录到游戏 logs 目录下的独立日志文件。
+ * </p>
  */
 public class AudioDeviceMonitor {
-
+    
+    public static final AudioDeviceMonitor INSTANCE = new AudioDeviceMonitor();
+    
     /**
      * 设备变化监听器接口
      * GUI 等组件注册此回调以实时响应设备变化
@@ -38,7 +50,6 @@ public class AudioDeviceMonitor {
         AudioFormat.Encoding.PCM_SIGNED, 48000, 16, 2, 4, 48000, false);
 
     private final Timer monitorTimer;
-    private final File logFile;
     private Set<AudioDeviceInfo> lastPlaybackDevices;
     private Set<AudioDeviceInfo> lastRecordingDevices;
     private boolean isRunning;
@@ -54,7 +65,6 @@ public class AudioDeviceMonitor {
 
     public AudioDeviceMonitor() {
         this.monitorTimer = new Timer("AudioDeviceMonitor", true);
-        this.logFile = new File(LOG_FILE_NAME);
         this.lastPlaybackDevices = new HashSet<>();
         this.lastRecordingDevices = new HashSet<>();
         this.isRunning = false;
@@ -92,7 +102,7 @@ public class AudioDeviceMonitor {
                 try {
                     listener.onDeviceListChanged();
                 } catch (Exception e) {
-                    SoundSwitcher.logger.error("Failed to notify device change listener: ", e);
+                    BugFwxer.logger.error("Failed to notify device change listener: ", e);
                 }
             }
         }
@@ -104,12 +114,12 @@ public class AudioDeviceMonitor {
     public void start() {
         synchronized (lock) {
             if (isRunning) {
-                SoundSwitcher.logger.warn("Audio device monitor is already running");
+                BugFwxer.logger.warn("Audio device monitor is already running");
                 return;
             }
 
             isRunning = true;
-            SoundSwitcher.logger.info("Audio device monitor started, check interval: " + CHECK_INTERVAL + "ms");
+            BugFwxer.logger.info("Audio device monitor started, check interval: " + CHECK_INTERVAL + "ms");
 
             // 立即执行一次检测
             performCheck();
@@ -135,7 +145,7 @@ public class AudioDeviceMonitor {
 
             isRunning = false;
             monitorTimer.cancel();
-            SoundSwitcher.logger.info("Audio device monitor has been terminated");
+            BugFwxer.logger.info("Audio device monitor has been terminated");
         }
     }
 
@@ -148,7 +158,6 @@ public class AudioDeviceMonitor {
 
     /**
      * 立即强制执行一次设备检测（供 GUI 打开时调用）
-     * @param forceUpdate 即使设备没变化也强制更新播放设备列表
      */
     public void forceCheckImmediately() {
         performCheckInternal(true);
@@ -156,6 +165,7 @@ public class AudioDeviceMonitor {
 
     /**
      * 内部检测逻辑
+     * @param forceUpdate 即使设备没变化也强制更新播放设备列表
      */
     private void performCheckInternal(boolean forceUpdate) {
         try {
@@ -179,7 +189,7 @@ public class AudioDeviceMonitor {
                 notifyDeviceChangeListeners();
             }
         } catch (Exception e) {
-            SoundSwitcher.logger.error("Failed to detect audio devices", e);
+            BugFwxer.logger.error("Failed to detect audio devices", e);
         }
     }
 
@@ -258,7 +268,7 @@ public class AudioDeviceMonitor {
                         );
                         devices.add(device);
                         
-                        SoundSwitcher.logger.debug("Detected playback device: " + mixerName + 
+                        BugFwxer.logger.debug("Detected playback device: " + mixerName + 
                             (isDefault ? " [default]" : ""));
                     }
                 } catch (Exception e) {
@@ -266,7 +276,7 @@ public class AudioDeviceMonitor {
                 }
             }
         } catch (Exception e) {
-            SoundSwitcher.logger.error("Failed to get playback devices", e);
+            BugFwxer.logger.error("Failed to get playback devices", e);
         }
 
         return devices;
@@ -274,7 +284,7 @@ public class AudioDeviceMonitor {
 
     /**
      * 判断是否过滤掉某些设备
-     * 过滤掉虚拟设备和无效设备，与早期 Mixin 对齐
+     * 过滤掉虚拟设备和无效设备，与早期 Mixin 保持完全一致
      */
     private boolean shouldFilterDevice(String deviceName) {
         if (deviceName == null || deviceName.trim().isEmpty()) {
@@ -284,11 +294,12 @@ public class AudioDeviceMonitor {
         String lowerName = deviceName.toLowerCase();
         
         // 过滤掉常见的虚拟/系统/录音设备 - 与早期 Mixin 保持完全一致
+        // 注意：不过滤 "Java Sound Audio Engine"，paulscode LibraryJavaSound
+        // 的 libraryCompatible() 依赖它存在，否则 SoundSystem 会退回 OpenAL
         String[] filters = {
             "primary sound capture",   // 主录音设备（不是播放设备）
             "port",                     // MIDI 端口
             "microsoft gs wavetable",  // MIDI 合成器
-            "java sound audio engine", // Java 虚拟引擎
             "unknown",                  // 未知设备
             "default",                  // 默认占位符
             "sndvol",                   // 音量控制虚拟设备
@@ -300,10 +311,6 @@ public class AudioDeviceMonitor {
             "line in",                 // 线路输入
             "microphone",              // 麦克风输入
             "phone",                   // 电话设备
-            "speaker",                 // 可能是虚拟扬声器
-            "麦克风",                   // 中文麦克风
-            "线路输入",                 // 中文线路输入
-            "立体声混音",               // 中文立体声混音
         };
         
         for (String filter : filters) {
@@ -351,44 +358,10 @@ public class AudioDeviceMonitor {
                 }
             }
         } catch (Exception e) {
-            SoundSwitcher.logger.error("Failed to get recording devices", e);
+            BugFwxer.logger.error("Failed to get recording devices", e);
         }
 
         return devices;
-    }
-
-    /**
-     * 测试播放设备是否真正可用
-     * 模拟 IBXM 和 paulscode 实际使用设备的方式
-     */
-    private boolean testPlaybackDevice(Mixer mixer, DataLine.Info lineInfo) {
-        SourceDataLine line = null;
-        try {
-            // 尝试从指定混音器获取线路
-            line = (SourceDataLine) mixer.getLine(lineInfo);
-            
-            // 尝试打开线路（不实际播放，只是验证设备可用）
-            // 这与 IBXM Player 的构造函数行为一致
-            line.open(DEFAULT_FORMAT);
-            
-            // 如果能成功打开，说明设备可用
-            return true;
-        } catch (LineUnavailableException e) {
-            // 设备不可用（可能被其他应用占用）
-            return false;
-        } catch (Exception e) {
-            // 其他错误
-            return false;
-        } finally {
-            // 确保关闭线路
-            if (line != null) {
-                try {
-                    line.close();
-                } catch (Exception e) {
-                    // 忽略关闭错误
-                }
-            }
-        }
     }
 
     /**
@@ -472,12 +445,26 @@ public class AudioDeviceMonitor {
     }
 
     /**
+     * 解析日志文件路径：优先放在游戏 logs 目录下，异常时回退到工作目录
+     */
+    private File resolveLogFile() {
+        try {
+            File gameDir = Launch.minecraftHome != null ? Launch.minecraftHome : new File(".");
+            return new File(gameDir, "logs" + File.separator + LOG_FILE_NAME);
+        } catch (Throwable ignored) {
+            // 启动早期 LaunchWrapper 可能未就绪，回退到工作目录
+        }
+        return new File(LOG_FILE_NAME);
+    }
+
+    /**
      * 记录设备变化到日志文件
      */
     private void logDeviceChanges(Set<AudioDeviceInfo> playbackDevices, 
                                    Set<AudioDeviceInfo> recordingDevices) {
         try {
-            checkLogFileSize();
+            File logFile = resolveLogFile();
+            checkLogFileSize(logFile);
 
             PrintWriter writer = new PrintWriter(new FileWriter(logFile, true));
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -526,23 +513,23 @@ public class AudioDeviceMonitor {
             writer.println("\n========================================\n");
             writer.close();
 
-            SoundSwitcher.logger.info("Audio device changes have been logged to: " + logFile.getAbsolutePath());
+            BugFwxer.logger.info("Audio device changes have been logged to: " + logFile.getAbsolutePath());
         } catch (IOException e) {
-            SoundSwitcher.logger.error("Failed to write audio device log", e);
+            BugFwxer.logger.error("Failed to write audio device log", e);
         }
     }
 
     /**
      * 检查日志文件大小，如果过大则备份
      */
-    private void checkLogFileSize() {
+    private void checkLogFileSize(File logFile) {
         if (logFile.exists() && logFile.length() > MAX_LOG_SIZE) {
-            File backupFile = new File(LOG_FILE_NAME + ".old");
+            File backupFile = new File(logFile.getParentFile(), LOG_FILE_NAME + ".old");
             if (backupFile.exists()) {
                 backupFile.delete();
             }
             logFile.renameTo(backupFile);
-            SoundSwitcher.logger.info("Audio device log file has been backed up");
+            BugFwxer.logger.info("Audio device log file has been backed up");
         }
     }
 
@@ -598,7 +585,7 @@ public class AudioDeviceMonitor {
     public String switchToNextPlaybackDevice() {
         synchronized (lock) {
             if (playbackDeviceList.isEmpty()) {
-                SoundSwitcher.logger.warn("No available playback devices");
+                BugFwxer.logger.warn("No available playback devices");
                 return null;
             }
             
@@ -609,7 +596,7 @@ public class AudioDeviceMonitor {
             // 记录用户偏好
             preferredPlaybackDeviceName = newDevice.getName();
             
-            SoundSwitcher.logger.info("Switched to audio output device: " + newDevice.getName());
+            BugFwxer.logger.info("Switched to audio output device: " + newDevice.getName());
             
             // 尝试通过 paulscode 切换混音器
             switchMixer(newDevice);
@@ -630,7 +617,7 @@ public class AudioDeviceMonitor {
                     currentPlaybackDeviceIndex = i;
                     preferredPlaybackDeviceName = deviceName;
                     
-                    SoundSwitcher.logger.info("Switched to audio output device: " + deviceName);
+                    BugFwxer.logger.info("Switched to audio output device: " + deviceName);
                     
                     // 尝试通过 paulscode 切换混音器
                     switchMixer(playbackDeviceList.get(i));
@@ -638,7 +625,7 @@ public class AudioDeviceMonitor {
                     return true;
                 }
             }
-            SoundSwitcher.logger.warn("Failed to find audio device: " + deviceName + " (JavaSound)");
+            BugFwxer.logger.warn("Failed to find audio device: " + deviceName + " (JavaSound)");
             return false;
         }
     }
@@ -661,7 +648,7 @@ public class AudioDeviceMonitor {
             }
             
             if (targetMixerInfo == null) {
-                SoundSwitcher.logger.error("Failed to find mixer: " + device.getName());
+                BugFwxer.logger.error("Failed to find mixer: " + device.getName());
                 return;
             }
             
@@ -673,7 +660,7 @@ public class AudioDeviceMonitor {
             switchMixerViaPaulscode(mixer);
             
         } catch (Exception e) {
-            SoundSwitcher.logger.error("Failed to switch mixer: " + e.getMessage());
+            BugFwxer.logger.error("Failed to switch mixer: " + e.getMessage());
         }
     }
 
@@ -694,14 +681,14 @@ public class AudioDeviceMonitor {
             java.lang.reflect.Method setMixerMethod = libraryJavaSoundClass.getMethod("setMixer", Mixer.class);
             setMixerMethod.invoke(null, mixer);
             
-            SoundSwitcher.logger.info("Successfully switched mixer via paulscode to: " + mixer.getMixerInfo().getName());
+            BugFwxer.logger.info("Successfully switched mixer via paulscode to: " + mixer.getMixerInfo().getName());
             
         } catch (ClassNotFoundException e) {
             // paulscode 不可用，尝试其他方式
-            SoundSwitcher.logger.warn("paulscode LibraryJavaSound is unavailable, trying other methods");
+            BugFwxer.logger.warn("paulscode LibraryJavaSound is unavailable, trying other methods");
             switchMixerViaJavaSound(mixer);
         } catch (Exception e) {
-            SoundSwitcher.logger.error("Failed to switch mixer via paulscode: " + e.getMessage());
+            BugFwxer.logger.error("Failed to switch mixer via paulscode: " + e.getMessage());
         }
     }
 
@@ -713,7 +700,7 @@ public class AudioDeviceMonitor {
         // 这里我们只是记录用户的设备偏好
         // 由于 JavaSound 本身不支持切换系统默认设备
         // 因此这里没有实际切换设备
-        SoundSwitcher.logger.info("Audio device preference recorded: " + mixer.getMixerInfo().getName());
+        BugFwxer.logger.info("Audio device preference recorded: " + mixer.getMixerInfo().getName());
 
     }
 }

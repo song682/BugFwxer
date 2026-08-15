@@ -1,4 +1,4 @@
-package decok.dfcdvadstf.soundswitcher.audio;
+package decok.dfcdvadstf.bugfwxer.audio;
 
 /**
  * 音频设备信息类
@@ -11,8 +11,8 @@ public class AudioDeviceInfo {
     private final DeviceType type;
 
     public enum DeviceType {
-        PLAYBACK("输出设备"),
-        RECORDING("输入设备");
+        PLAYBACK("Input Device"),
+        RECORDING("Output Device");
 
         private final String displayName;
 
