@@ -30,6 +30,5 @@ public abstract class MixinGuiSlot {
         if (this.getAmountScrolled() < 0.0F) {
             this.setAmountScrolled(0.0F);
         }
-
     }
 }
